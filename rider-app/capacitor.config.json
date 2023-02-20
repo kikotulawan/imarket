@@ -1,0 +1,6 @@
+{
+  "appId": "com.imarketrider.app",
+  "appName": "imarket-rider-app",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

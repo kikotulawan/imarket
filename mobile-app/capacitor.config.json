@@ -1,0 +1,6 @@
+{
+  "appId": "com.imarket.app",
+  "appName": "imarket-mobile",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

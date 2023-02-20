@@ -1,0 +1,213 @@
+import API from "../../base/";
+export default {
+ namespaced: true,
+ state: {
+  user: {},
+  distanceMatrix: null,
+  token: localStorage.getItem("auth") || "",
+  userLogs: [],
+ },
+ getters: {},
+ mutations: {
+  SET_MATRIX(state, payload) {
+   state.distanceMatrix = payload;
+  },
+  SET_AUTH_ACC(state, data) {
+   state.userinfo = data.user_info;
+   state.useraccount = data.user_account;
+   const bearer_token = localStorage.getItem("auth") || "";
+   API.defaults.headers.common["Authorization"] = `Bearer ${bearer_token}`;
+  },
+  SET_ACC(state, data) {
+   state.user = data;
+   const bearer_token = localStorage.getItem("auth") || "";
+   API.defaults.headers.common["Authorization"] = `Bearer ${bearer_token}`;
+  },
+  SET_USER_ACC(state, data) {
+   state.user = data;
+  },
+  SET_USER_TOKEN(state, token) {
+   localStorage.setItem("auth", token);
+   state.token = token;
+
+   const bearer_token = localStorage.getItem("auth") || "";
+   API.defaults.headers.common["Authorization"] = `Bearer ${bearer_token}`;
+  },
+  UNSET_USER(state) {
+   localStorage.removeItem("auth");
+   localStorage.removeItem("isUser");
+   state.token = "";
+   (state.user = {}), (API.defaults.headers.common["Authorization"] = "");
+  },
+  SET_LOGS(state, payload) {
+   state.userLogs = payload;
+  },
+ },
+ actions: {
+  async getLogs({ commit }) {
+   const res = await API.get("auth/logs")
+    .then((res) => {
+     commit("SET_LOGS", res.data);
+     return res;
+    })
+    .catch((error) => {
+     return error.response;
+    });
+
+   return res;
+  },
+  async login({ commit }, payload) {
+   const res = await API.post("/auth/login", payload)
+    .then((res) => {
+     commit("SET_USER_ACC", res.data.user);
+     commit("SET_USER_TOKEN", res.data.access_token);
+
+     return res;
+    })
+    .catch((err) => {
+     return err.response;
+    });
+
+   return res;
+  },
+  async register({ commit }, payload) {
+   const res = await API.post("/auth/register", payload)
+    .then((res) => {
+     return res;
+    })
+    .catch((err) => {
+     return err.response;
+    });
+
+   return res;
+  },
+  async registerSeller({ commit }, payload) {
+   const res = await API.post("/auth/partnership", payload)
+    .then((res) => {
+     return res;
+    })
+    .catch((err) => {
+     return err.response;
+    });
+
+   return res;
+  },
+  async update({ commit }, data) {
+   const res = await API.post(`auth/update`, data)
+    .then((res) => {
+     return res;
+    })
+    .catch((err) => {
+     return err.response;
+    });
+
+   return res;
+  },
+  async removeImage({ commit }) {
+   const res = await API.post("remove-profile")
+    .then((res) => {
+     return res;
+    })
+    .catch((error) => {
+     return error.response;
+    });
+
+   return res;
+  },
+  async changePassword({ commit }, data) {
+   const res = await API.post("auth/update-password", data)
+    .then((res) => {
+     return res;
+    })
+    .catch((error) => {
+     return error.response;
+    });
+
+   return res;
+  },
+  async logout({ commit }) {
+   const res = await API.post("auth/logout?token=" + localStorage.getItem("auth"))
+    .then((response) => {
+     commit("UNSET_USER");
+     return response;
+    })
+    .catch((error) => {
+     return error.response;
+    });
+
+   return res;
+  },
+  async checkUser({ commit }) {
+   const res = await API.post("auth/me?token=" + localStorage.getItem("auth"))
+    .then((res) => {
+     commit("SET_ACC", res.data);
+     return res;
+    })
+    .catch((error) => {
+     commit("UNSET_USER");
+
+     return error.response;
+    });
+
+   return res;
+  },
+  async allOrders({ commit }) {
+   const res = await API.get("admin/all-orders?token=" + localStorage.getItem("auth"))
+    .then((res) => {
+     return res;
+    })
+    .catch((error) => {
+     return error.response;
+    });
+
+   return res;
+  },
+  async orderInfo({ commit }, id) {
+   const res = await API.get(`admin/order-info/${id}?token=` + localStorage.getItem("auth"))
+    .then((res) => {
+     return res;
+    })
+    .catch((error) => {
+     return error.response;
+    });
+
+   return res;
+  },
+  async acceptOrder({ commit }, id) {
+   const res = await API.put(`admin/accept-order/${id}?token=` + localStorage.getItem("auth"))
+    .then((res) => {
+     return res;
+    })
+    .catch((error) => {
+     return error.response;
+    });
+
+   return res;
+  },
+  async completeOrder({ commit }, id) {
+   const res = await API.put(`admin/complete-order/${id}?token=` + localStorage.getItem("auth"))
+    .then((res) => {
+     return res;
+    })
+    .catch((error) => {
+     return error.response;
+    });
+
+   return res;
+  },
+  async updateAddress({ commit }, payload) {
+   const res = await API.post("auth/update-address?token=" + localStorage.getItem("auth"), payload)
+    .then((res) => {
+     // commit('SET_ACC', res.data)
+     return res;
+    })
+    .catch((error) => {
+     commit("UNSET_USER");
+
+     return error.response;
+    });
+
+   return res;
+  },
+ },
+};
